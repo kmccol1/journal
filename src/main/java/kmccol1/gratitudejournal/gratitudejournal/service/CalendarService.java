@@ -30,7 +30,8 @@ public class CalendarService
     public CalendarEntry createEntry(CalendarEntry entry)
     {
         // Check if user exists without throwing an exception
-        if (!userService.userExists(entry.getUserId())) {
+        if (!userService.userExists(entry.getUserId()))
+        {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
 

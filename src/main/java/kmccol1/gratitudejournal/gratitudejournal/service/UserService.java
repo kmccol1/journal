@@ -7,12 +7,10 @@
 //
 //***************************************************************************************
 
-
 package kmccol1.gratitudejournal.gratitudejournal.service;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
-import kmccol1.gratitudejournal.gratitudejournal.exception.UserNotFoundException;
 import kmccol1.gratitudejournal.gratitudejournal.model.Role;
 import kmccol1.gratitudejournal.gratitudejournal.model.User;
 import kmccol1.gratitudejournal.gratitudejournal.payload.RegisterRequest;
@@ -29,6 +27,8 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+
+//***************************************************************************************
 
 @Service
 public class UserService implements UserDetailsService
@@ -82,7 +82,8 @@ public class UserService implements UserDetailsService
         return userRepository.save(user);
     }
 
-    public Optional<User> findByUsername(String username) {
+    public Optional<User> findByUsername(String username)
+    {
         return userRepository.findByUsername(username);
     }
 

@@ -13,13 +13,15 @@ package kmccol1.gratitudejournal.gratitudejournal.model;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+//***************************************************************************************
+
 @Entity
 @Table(name = "calendar_entries")
-public class CalendarEntry {
+public class CalendarEntry
+{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +40,8 @@ public class CalendarEntry {
     public CalendarEntry() {}
 
     // Constructor with all fields
-    public CalendarEntry(String title, String content, LocalDate entryDate, Integer userId) {
+    public CalendarEntry(String title, String content, LocalDate entryDate, Integer userId)
+    {
         this.title = title;
         this.content = content;
         this.entryDate = entryDate;
