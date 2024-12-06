@@ -1,22 +1,34 @@
 //***************************************************************************************
 //
-//     Filename: LoginRequest.java
+//     Filename: UserRegistrationDTO.java
 //     Author: Kyle McColgan
-//     Date: 27 November 2024
-//     Description: This file formats all login requests for maintainability.
+//     Date: 03 December 2024
+//     Description: This file holds uer related information in an object.
 //
 //***************************************************************************************
 
-package kmccol1.gratitudejournal.gratitudejournal.payload;
+package kmccol1.gratitudejournal.gratitudejournal.dto;
 
 //***************************************************************************************
 
-public class LoginRequest
+public class UserRegistrationDTO
 {
     private String username;
+    private String email;
     private String password;
 
-    // Getters and Setters
+    // Default constructor
+    public UserRegistrationDTO() {}
+
+    // Parameterized constructor
+    public UserRegistrationDTO(String username, String email, String password)
+    {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    // Getters and setters
     public String getUsername()
     {
         return username;
@@ -25,6 +37,16 @@ public class LoginRequest
     public void setUsername(String username)
     {
         this.username = username;
+    }
+
+    public String getEmail()
+    {
+        return email;
+    }
+
+    public void setEmail(String email)
+    {
+        this.email = email;
     }
 
     public String getPassword()

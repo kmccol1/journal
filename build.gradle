@@ -30,9 +30,13 @@ dependencies {
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'  // Ensure JUnit 5 is used
+	testImplementation 'org.mockito:mockito-core:5.+' // Use the latest version
+//	testImplementation 'org.mockito:mockito-inline:5.+' // Inline support
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+	jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
 }

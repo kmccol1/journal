@@ -2,15 +2,17 @@
 //
 //     Filename: User.java
 //     Author: Kyle McColgan
-//     Date: 27 November 2024
+//     Date: 04 December 2024
 //     Description: This file stores information related to the user.
 //
 //***************************************************************************************
 
 package kmccol1.gratitudejournal.gratitudejournal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 //***************************************************************************************
@@ -30,12 +32,14 @@ public class User
 
     private String email;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER) //EAGER or LAZY gives errors...
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @JsonIgnore  // Avoid circular reference when serializing User
+    private Set<Role> roles;
 
     // Default constructor
     public User()
@@ -106,6 +110,30 @@ public class User
     public void setId(Integer id)
     {
         this.id = id;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(id);
     }
 }
 

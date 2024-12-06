@@ -2,7 +2,7 @@
 //
 //     Filename: UserService.java
 //     Author: Kyle McColgan
-//     Date: 27 November 2024
+//     Date: 03 December 2024
 //     Description: This file provides abstracted registration functionality.
 //
 //***************************************************************************************
@@ -11,19 +11,14 @@ package kmccol1.gratitudejournal.gratitudejournal.service;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import kmccol1.gratitudejournal.gratitudejournal.dto.UserRegistrationDTO;
 import kmccol1.gratitudejournal.gratitudejournal.model.Role;
 import kmccol1.gratitudejournal.gratitudejournal.model.User;
-import kmccol1.gratitudejournal.gratitudejournal.payload.RegisterRequest;
 import kmccol1.gratitudejournal.gratitudejournal.repository.RoleRepository;
 import kmccol1.gratitudejournal.gratitudejournal.repository.UserRepository;
-import kmccol1.gratitudejournal.gratitudejournal.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -31,46 +26,45 @@ import java.util.Set;
 //***************************************************************************************
 
 @Service
-public class UserService implements UserDetailsService
+public class UserService implements UserRetrievalService
 {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    @Lazy // Lazy loading to avoid circular dependency...
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public UserService(UserRepository userRepository)
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder)
     {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
-    public User registerUser(RegisterRequest registerRequest)
+    public User registerUser(UserRegistrationDTO registrationDTO)
     {
         // Check for existing username or email
-        if (userRepository.existsByUsername(registerRequest.getUsername()))
+        if (userRepository.existsByUsername(registrationDTO.getUsername()))
         {
             throw new RuntimeException("Error: Username is already taken!");
         }
 
-        if (userRepository.existsByEmail(registerRequest.getEmail()))
+        if (userRepository.existsByEmail(registrationDTO.getEmail()))
         {
             throw new RuntimeException("Error: Email is already in use!");
         }
 
         // Create new user
-        User user = new User(registerRequest.getUsername(), registerRequest.getEmail(), passwordEncoder.encode(registerRequest.getPassword()));
+        User user = new User(
+                registrationDTO.getUsername(),
+                registrationDTO.getEmail(),
+                passwordEncoder.encode(registrationDTO.getPassword())
+        );
 
         // Assign roles - by default, every user gets "ROLE_USER"
         Role userRole = roleRepository.findByName("ROLE_USER");
         if (userRole == null)
         {
-            // If "ROLE_USER" doesn't exist, create it
             userRole = new Role("ROLE_USER");
             roleRepository.save(userRole);
         }
@@ -82,28 +76,18 @@ public class UserService implements UserDetailsService
         return userRepository.save(user);
     }
 
+    @Override
     public Optional<User> findByUsername(String username)
     {
         return userRepository.findByUsername(username);
     }
 
     @Transactional
-    @Override
-    public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException
-    {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
-        return UserDetailsImpl.build(user);
-    }
-
-    @Transactional
     @PostConstruct
     public void initRoles()
     {
-        // Check if roles are already in the database
         if (roleRepository.count() == 0)
         {
-            // Creating default roles if not present
             Role roleUser = new Role("ROLE_USER");
             Role roleAdmin = new Role("ROLE_ADMIN");
             roleRepository.save(roleUser);
@@ -115,8 +99,5 @@ public class UserService implements UserDetailsService
     {
         return userRepository.existsById(userId);
     }
-
-
 }
-
 //***************************************************************************************

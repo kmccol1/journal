@@ -2,8 +2,8 @@
 //
 //     Filename: JwtUtils.java
 //     Author: Kyle McColgan
-//     Date: 27 November 2024
-//     Description: This file contains the auth token object definition.
+//     Date: 04 December 2024
+//     Description: This file contains the auth token generation process.
 //
 //***************************************************************************************
 
@@ -29,7 +29,7 @@ public class JwtUtils
     @Value("${jwt.expirationMs}")
     private int jwtExpirationMs;
 
-    public String generateJwtToken(String username,
+    public String generateJwtToken(Integer userId, String username,
                                    Collection<? extends GrantedAuthority> authorities)
     {
         String roles = authorities.stream()
@@ -38,6 +38,7 @@ public class JwtUtils
 
         return Jwts.builder()
                 .setSubject(username)
+                .claim("userId", userId)  // Include userId in the JWT
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
@@ -55,11 +56,23 @@ public class JwtUtils
                     .parseClaimsJws(token)
                     .getBody();
         }
+        catch (ExpiredJwtException e)
+        {
+            System.out.println("JWT token is expired: " + e.getMessage());
+        }
+        catch (UnsupportedJwtException e)
+        {
+            System.out.println("JWT token is unsupported: " + e.getMessage());
+        }
+        catch (MalformedJwtException e)
+        {
+            System.out.println("Malformed JWT token: " + e.getMessage());
+        }
         catch (JwtException | IllegalArgumentException e)
         {
             System.out.println("Invalid JWT token: " + e.getMessage());
-            return null;
         }
+        return null;
     }
 
     public String getUserNameFromJwtToken(String token)
@@ -70,7 +83,21 @@ public class JwtUtils
 
     public boolean validateJwtToken(String authToken)
     {
-        return getClaimsFromToken(authToken) != null;
+        try
+        {
+            Claims claims = getClaimsFromToken(authToken);
+            return claims != null && !isTokenExpired(claims);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error during token validation: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean isTokenExpired(Claims claims)
+    {
+        return claims.getExpiration().before(new Date());
     }
 }
 

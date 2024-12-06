@@ -2,8 +2,8 @@
 //
 //     Filename: UserDetailsImpl.java
 //     Author: Kyle McColgan
-//     Date: 27 November 2024
-//     Description: This file contains the back end account structure and methods.
+//     Date: 03 December 2024
+//     Description: This file contains functionality related to user accounts.
 //
 //***************************************************************************************
 
@@ -13,7 +13,6 @@ import kmccol1.gratitudejournal.gratitudejournal.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -105,6 +104,7 @@ public class UserDetailsImpl implements UserDetails
     {
         return true;
     }
+
 }
 
 //***************************************************************************************

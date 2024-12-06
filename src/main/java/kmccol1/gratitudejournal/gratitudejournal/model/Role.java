@@ -2,15 +2,16 @@
 //
 //     Filename: Role.java
 //     Author: Kyle McColgan
-//     Date: 27 November 2024
+//     Date: 04 December 2024
 //     Description: This file contains the Role entity class.
 //
 //***************************************************************************************
 
 package kmccol1.gratitudejournal.gratitudejournal.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 //***************************************************************************************
@@ -19,7 +20,6 @@ import java.util.Set;
 @Table(name = "roles")
 public class Role
 {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -28,11 +28,14 @@ public class Role
     private String name;  // Example values: "ROLE_USER", "ROLE_ADMIN"
 
     @ManyToMany(mappedBy = "roles")
-    private Set<User> users = new HashSet<>();
+    @JsonBackReference  // Avoid circular reference when serializing Role
+    private Set<User> users;
 
-    // Constructors
+    //Constructors
+    // No-argument constructor (required by JPA)
     public Role() {}
 
+    // No-argument constructor (required by JPA)
     public Role(String name)
     {
         this.name = name;
@@ -76,6 +79,21 @@ public class Role
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Role role = (Role) o;
+        return Objects.equals(id, role.id);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(id);
     }
 }
 
